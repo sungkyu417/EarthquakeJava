@@ -59,7 +59,65 @@ import java.util.List;
 )
 public class ControllerConfig extends WebMvcConfigurerAdapter {
     @Inject
+    Environment env;
+
+    @Inject
     ApplicationContext applicationContext;
+    @Inject
+    SpringValidatorAdapter validatorAdapter;
 
+    @Inject
+    ObjectMapper objectMapper;
+    @Inject
+    Marshaller marshaller;
+    @Inject
+    Unmarshaller unmarshaller;
 
+    @Override
+    public void configureMessageConverters(
+            List<HttpMessageConverter<?>> converters
+    ) {
+        String baseEncode = env.getProperty("project.encode");
+
+        converters.add(new ByteArrayHttpMessageConverter());
+        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
+        stringHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
+                new MediaType("text", "plain", Charset.forName(baseEncode)),
+                new MediaType("text", "html", Charset.forName(baseEncode))
+        ));
+        converters.add(stringHttpMessageConverter);
+        converters.add(new FormHttpMessageConverter());
+        converters.add(new SourceHttpMessageConverter<>());
+
+        //add json converter
+        MappingJackson2HttpMessageConverter jsonConverter =
+                new MappingJackson2HttpMessageConverter();
+        jsonConverter.setSupportedMediaTypes(Arrays.asList(
+                new MediaType("application", "json", Charset.forName(baseEncode)),
+                new MediaType("text", "json", Charset.forName(baseEncode)),
+                new MediaType("application", "x-www-form-urlencoded", Charset.forName(baseEncode))
+        ));
+        jsonConverter.setObjectMapper(this.objectMapper);
+        converters.add(jsonConverter);
+
+        //add xml converter
+        MarshallingHttpMessageConverter xmlConverter =
+                new MarshallingHttpMessageConverter();
+        xmlConverter.setSupportedMediaTypes(Arrays.asList(
+                new MediaType("application", "xml", Charset.forName(baseEncode)),
+                new MediaType("text", "xml", Charset.forName(baseEncode))
+        ));
+        xmlConverter.setMarshaller(this.marshaller);
+        xmlConverter.setUnmarshaller(this.unmarshaller);
+        converters.add(xmlConverter);
+    }
+
+    @Override
+    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+        configurer.favorPathExtension(true).favorParameter(false)
+                .parameterName("mediaType").ignoreAcceptHeader(false)
+                .useJaf(false).defaultContentType(MediaType.APPLICATION_XML)
+                .mediaType("xml", MediaType.APPLICATION_XML)
+                .mediaType("json", MediaType.APPLICATION_JSON);
+    }
 }
