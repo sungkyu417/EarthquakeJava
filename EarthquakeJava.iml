@@ -16,6 +16,7 @@
         <fileset id="fileset" name="Spring Application Context" removed="false">
           <file>file://$MODULE_DIR$/src/com/intelligentEarthquake/config/ContextConfig.java</file>
           <file>file://$MODULE_DIR$/src/com/intelligentEarthquake/config/ControllerConfig.java</file>
+          <file>file://$MODULE_DIR$/web/WEB-INF/applicationContext.xml</file>
         </fileset>
       </configuration>
     </facet>
@@ -37,7 +38,7 @@
       </configuration>
     </facet>
   </component>
-  <component name="NewModuleRootManager" inherit-compiler-output="false">
+  <component name="NewModuleRootManager" inherit-compiler-output="true">
     <output url="file://$MODULE_DIR$/out/production/test1" />
     <output-test url="file://$MODULE_DIR$/out/test/test1" />
     <exclude-output />
@@ -56,5 +57,7 @@
     <orderEntry type="library" name="javax.servlet-api-3.1.0" level="project" />
     <orderEntry type="library" name="javax.inject-1" level="project" />
     <orderEntry type="library" name="jackson-databind-2.6.2" level="project" />
+    <orderEntry type="library" name="log4j-api-2.3" level="project" />
+    <orderEntry type="library" name="slf4j-api-1.7.12" level="project" />
   </component>
 </module>

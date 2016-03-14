@@ -1,9 +1,6 @@
 package com.intelligentEarthquake.config;
 
-import org.springframework.context.annotation.AdviceMode;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
@@ -16,6 +13,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.persistence.ValidationMode;
@@ -30,7 +28,7 @@ import java.util.Map;
 
 @Configuration
 @ComponentScan(
-        basePackages = "com.intelligentEarthquake",
+        basePackages = "com.intelligentEarthquake.config",
         excludeFilters = {
                 @ComponentScan.Filter(Controller.class),
                 @ComponentScan.Filter(ControllerAdvice.class)
@@ -46,18 +44,12 @@ import java.util.Map;
         transactionManagerRef = "jpaTransactionManager"
 //        repositoryFactoryBeanClass = CustomRepositoryFactoryBean.class
 )
+@Import({ControllerConfig.class})
 public class ContextConfig {
     static String driver = "com.mysql.jdbc.Driver";
     static String jdbcUrl = "jdbc:mysql://61.155.7.140:3308/imonitor";
     static String username = "root";
     static String password = "shield";
-
-    //原来的JNDI数据源
-    @Bean
-    public DataSource jndiDataSource() {
-        JndiDataSourceLookup lookup = new JndiDataSourceLookup();
-        return lookup.getDataSource("java:comp/env/jdbc/cg");
-    }
 
     //c3p0数据源
     @Bean
@@ -69,6 +61,14 @@ public class ContextConfig {
         c3p0.setPassword(password);
         return c3p0;
     }
+
+//    //内容协商
+//    @Bean
+//    public ContentNegotiatingViewResolver contentNegotiatingViewResolver(){
+//        ContentNegotiatingViewResolver viewResolver = new ContentNegotiatingViewResolver();
+//
+//        return viewResolver;
+//    }
 
     //容器管理类型的JPA，实现为Hibernate
     @Bean
@@ -107,7 +107,7 @@ public class ContextConfig {
     @Bean
     public InternalResourceViewResolver resourceViewResolver(){
         InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
-        viewResolver.setPrefix("web/resources/views");
+        viewResolver.setPrefix("");
         viewResolver.setSuffix(".jsp");
         return viewResolver;
     }

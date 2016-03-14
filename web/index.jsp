@@ -14,8 +14,8 @@
 fefefe
   </body>
 <script>
-  var xhr = new XMLHttpRequest();
-  xhr.open("post","/home");
-  xhr.send({"aa":"bb"});
+//  var xhr = new XMLHttpRequest();
+//  xhr.open("post","/home");
+//  xhr.send({"aa":"bb"});
 </script>
 </html>

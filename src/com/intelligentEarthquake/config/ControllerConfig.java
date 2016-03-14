@@ -50,7 +50,7 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @ComponentScan(
-        basePackages = {"com.intelligentEarthquake"},
+        basePackages = {"com.intelligentEarthquake.controller"},
         useDefaultFilters = false,
         includeFilters = {
                 @ComponentScan.Filter(Controller.class),
@@ -58,149 +58,8 @@ import java.util.List;
         }
 )
 public class ControllerConfig extends WebMvcConfigurerAdapter {
-
-    @Inject
-    Environment env;
-
     @Inject
     ApplicationContext applicationContext;
-    @Inject
-    SpringValidatorAdapter validatorAdapter;
-
-    @Inject
-    ObjectMapper objectMapper;
-    @Inject
-    Marshaller marshaller;
-    @Inject
-    Unmarshaller unmarshaller;
-
-    @Override
-    public void configureMessageConverters(
-            List<HttpMessageConverter<?>> converters
-    ) {
-        String baseEncode = env.getProperty("project.encode");
-
-        converters.add(new ByteArrayHttpMessageConverter());
-        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
-        stringHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("text", "plain", Charset.forName(baseEncode)),
-                new MediaType("text", "html", Charset.forName(baseEncode))
-        ));
-        converters.add(stringHttpMessageConverter);
-        converters.add(new FormHttpMessageConverter());
-        converters.add(new SourceHttpMessageConverter<>());
-
-        //add json converter
-        MappingJackson2HttpMessageConverter jsonConverter =
-                new MappingJackson2HttpMessageConverter();
-        jsonConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("application", "json", Charset.forName(baseEncode)),
-                new MediaType("text", "json", Charset.forName(baseEncode)),
-                new MediaType("application", "x-www-form-urlencoded", Charset.forName(baseEncode))
-        ));
-        jsonConverter.setObjectMapper(this.objectMapper);
-        converters.add(jsonConverter);
-
-        //add xml converter
-        MarshallingHttpMessageConverter xmlConverter =
-                new MarshallingHttpMessageConverter();
-        xmlConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("application", "xml", Charset.forName(baseEncode)),
-                new MediaType("text", "xml", Charset.forName(baseEncode))
-        ));
-        xmlConverter.setMarshaller(this.marshaller);
-        xmlConverter.setUnmarshaller(this.unmarshaller);
-        converters.add(xmlConverter);
-    }
-
-    @Override
-    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(true).favorParameter(false)
-                .parameterName("mediaType").ignoreAcceptHeader(false)
-                .useJaf(false).defaultContentType(MediaType.APPLICATION_XML)
-                .mediaType("xml", MediaType.APPLICATION_XML)
-                .mediaType("json", MediaType.APPLICATION_JSON);
-    }
-
-    @Bean
-    public ViewResolver viewResolver() {
-        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
-
-        resolver.setViewClass(JstlView.class);
-        resolver.setPrefix("/WEB-INF/m/");
-        resolver.setSuffix(".jsp");
-        return resolver;
-    }
-
-    /**
-     * if you want to return entities and entities attribute, you need it translate entities to name of view.
-     *
-     */
-    @Bean
-    public RequestToViewNameTranslator viewNameTranslator()
-    {
-        return new DefaultRequestToViewNameTranslator();
-    }
 
 
-    /**
-     * add argumentResolvers
-     * include resolver for pageable parameter, sort parameter
-     *
-     * just when defecting pageable and sort parameter, this configuration will work
-     */
-    @Override
-    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> argumentResolvers) {
-        Sort defaultSort = new Sort(
-                new Sort.Order(Sort.Direction.ASC, "createDate"),
-                new Sort.Order(Sort.Direction.ASC, "id")
-        );
-        Pageable defaultPageable = new PageRequest(0, 20, defaultSort);
-
-        SortHandlerMethodArgumentResolver sortResolver =
-                new SortHandlerMethodArgumentResolver();
-
-        //default parameter's name is "sort"
-        sortResolver.setSortParameter("$paging.sort");
-        sortResolver.setFallbackSort(defaultSort);
-
-        PageableHandlerMethodArgumentResolver pageableResolver =
-                new PageableHandlerMethodArgumentResolver(sortResolver);
-
-        pageableResolver.setMaxPageSize(20);
-        //page starts at 1, not 0
-        pageableResolver.setOneIndexedParameters(true);
-        //use default name: "page" and "size"
-        pageableResolver.setPrefix("$paging.");
-        pageableResolver.setFallbackPageable(defaultPageable);
-
-        argumentResolvers.add(sortResolver);
-        argumentResolvers.add(pageableResolver);
-    }
-
-    /**
-     * Add a DomainClassConverter, it will converters request parameters and path parameters to Entities.
-     * It belongs to Spring DATA's support for Spring MVC.
-     *
-     * @param registry must be instance of FormattingConversionService, otherwise DATA JPA converter
-     *                 won't work normally.
-     */
-    @Override
-    public void addFormatters(FormatterRegistry registry) {
-
-        DomainClassConverter<FormattingConversionService> converter =
-                new DomainClassConverter<>((FormattingConversionService)registry);
-
-        converter.setApplicationContext(this.applicationContext);
-    }
-
-    /**
-     * Spring MVC will cover the Validator in root context,
-     * so you must add getValidator method
-     *
-     */
-    @Bean
-    public Validator getValidator() {
-        return this.validatorAdapter;
-    }
 }
