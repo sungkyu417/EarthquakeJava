@@ -5,17 +5,17 @@
     <description>This persistence unit include entity in base package.</description>
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
     <non-jta-data-source>java:/comp/env/jdbc/cg</non-jta-data-source>
-        <class>com.intelligentEarthquake.entity.Earthquake</class>
+        <class>com.intelligentEarthquake.entity.CrawlerEntity</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>
     <properties>
         <property name="javax.persistence.schema-generation.database.action"
                   value="none" />
-        <property name="hibernate.connection.url" value="jdbc:mysql://61.155.7.140:3308/imonitor"/>
+        <property name="hibernate.connection.url" value="jdbc:mysql://127.0.0.1:3306/earthquake"/>
         <property name="hibernate.connection.driver_class" value="com.mysql.jdbc.Driver"/>
-        <property name="hibernate.connection.username" value="root"/>
-        <property name="hibernate.connection.password" value="shield"/>
+        <property name="hibernate.connection.username"/>
+        <property name="hibernate.connection.password"/>
     </properties>
     </persistence-unit>
 </persistence>

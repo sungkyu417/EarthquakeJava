@@ -1,22 +1,19 @@
 package com.intelligentEarthquake.entity;
 
-import javax.persistence.Basic;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
+import javax.persistence.*;
 
 /**
- * Created by FLY on 2016/2/18 0018.
+ * Created by flylu on 2016/4/9.
  */
 @Entity
-public class Earthquake {
+@Table(name = "crawler", schema = "earthquake", catalog = "")
+public class CrawlerEntity {
     private int id;
     private String title;
-    private String info;
     private String content;
 
     @Id
-    @Column(name = "id", nullable = false, insertable = true, updatable = true)
+    @Column(name = "id")
     public int getId() {
         return id;
     }
@@ -26,7 +23,7 @@ public class Earthquake {
     }
 
     @Basic
-    @Column(name = "title", nullable = true, insertable = true, updatable = true, length = 255)
+    @Column(name = "title")
     public String getTitle() {
         return title;
     }
@@ -36,17 +33,7 @@ public class Earthquake {
     }
 
     @Basic
-    @Column(name = "info", nullable = true, insertable = true, updatable = true, length = 255)
-    public String getInfo() {
-        return info;
-    }
-
-    public void setInfo(String info) {
-        this.info = info;
-    }
-
-    @Basic
-    @Column(name = "content", nullable = true, insertable = true, updatable = true, length = 65535)
+    @Column(name = "content")
     public String getContent() {
         return content;
     }
@@ -60,11 +47,10 @@ public class Earthquake {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
 
-        Earthquake that = (Earthquake) o;
+        CrawlerEntity that = (CrawlerEntity) o;
 
         if (id != that.id) return false;
         if (title != null ? !title.equals(that.title) : that.title != null) return false;
-        if (info != null ? !info.equals(that.info) : that.info != null) return false;
         if (content != null ? !content.equals(that.content) : that.content != null) return false;
 
         return true;
@@ -74,7 +60,6 @@ public class Earthquake {
     public int hashCode() {
         int result = id;
         result = 31 * result + (title != null ? title.hashCode() : 0);
-        result = 31 * result + (info != null ? info.hashCode() : 0);
         result = 31 * result + (content != null ? content.hashCode() : 0);
         return result;
     }
