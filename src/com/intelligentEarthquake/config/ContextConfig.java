@@ -1,19 +1,17 @@
 package com.intelligentEarthquake.config;
 
+import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.context.annotation.*;
 import org.springframework.core.Ordered;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
-import org.springframework.jdbc.datasource.lookup.JndiDataSourceLookup;
 import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.Database;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
-import com.mchange.v2.c3p0.ComboPooledDataSource;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 
 import javax.persistence.ValidationMode;
@@ -47,9 +45,9 @@ import java.util.Map;
 @Import({ControllerConfig.class})
 public class ContextConfig {
     static String driver = "com.mysql.jdbc.Driver";
-    static String jdbcUrl = "jdbc:mysql://61.155.7.140:3308/imonitor";
+    static String jdbcUrl = "jdbc:mysql://127.0.0.1:3306/earthquake";
     static String username = "root";
-    static String password = "shield";
+    static String password = "1234";
 
     //c3p0数据源
     @Bean
