@@ -5,7 +5,8 @@
     <description>This persistence unit include entity in base package.</description>
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
     <non-jta-data-source>java:/comp/env/jdbc/cg</non-jta-data-source>
-        <class>com.intelligentEarthquake.entity.CrawlerEntity</class>
+        <class>com.intelligentEarthquake.model.CrawlerEntity</class>
+        <class>com.intelligentEarthquake.model.LeftnavEntity</class>
         <exclude-unlisted-classes>false</exclude-unlisted-classes>
     <shared-cache-mode>ENABLE_SELECTIVE</shared-cache-mode>
     <validation-mode>NONE</validation-mode>

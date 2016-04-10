@@ -1,4 +1,4 @@
-package com.intelligentEarthquake.entity;
+package com.intelligentEarthquake.model;
 
 import javax.persistence.*;
 

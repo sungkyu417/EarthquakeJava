@@ -86,7 +86,7 @@ public class ContextConfig {
         //properties.put("hibernate.hbm2ddl.auto", "create");
         factoryBean.setJpaVendorAdapter(adapter);
         factoryBean.setDataSource(this.springJpaDataSource());
-        factoryBean.setPackagesToScan("com.intelligentEarthquake.entity");
+        factoryBean.setPackagesToScan("com.intelligentEarthquake.model");
         factoryBean.setValidationMode(ValidationMode.NONE);
         factoryBean.setJpaPropertyMap(properties);
 

@@ -1,46 +1,22 @@
 package com.intelligentEarthquake.config;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.springframework.context.ApplicationContext;
+import com.intelligentEarthquake.viewResolver.JsonViewResolver;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.core.env.Environment;
-import org.springframework.data.repository.support.DomainClassConverter;
-import org.springframework.data.web.PageableHandlerMethodArgumentResolver;
-import org.springframework.data.web.SortHandlerMethodArgumentResolver;
-import org.springframework.format.FormatterRegistry;
-import org.springframework.format.support.FormattingConversionService;
 import org.springframework.http.MediaType;
-import org.springframework.http.converter.ByteArrayHttpMessageConverter;
-import org.springframework.http.converter.FormHttpMessageConverter;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
-import org.springframework.http.converter.xml.SourceHttpMessageConverter;
-import org.springframework.oxm.Marshaller;
-import org.springframework.oxm.Unmarshaller;
-import org.springframework.stereotype.Controller;
-import org.springframework.validation.Validator;
-import org.springframework.validation.beanvalidation.SpringValidatorAdapter;
-import org.springframework.web.bind.annotation.ControllerAdvice;
-import org.springframework.web.method.support.HandlerMethodArgumentResolver;
-import org.springframework.web.servlet.RequestToViewNameTranslator;
+import org.springframework.web.accept.ContentNegotiationManager;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ContentNegotiationConfigurer;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
-import org.springframework.web.servlet.view.DefaultRequestToViewNameTranslator;
+import org.springframework.web.servlet.view.ContentNegotiatingViewResolver;
 import org.springframework.web.servlet.view.InternalResourceViewResolver;
 import org.springframework.web.servlet.view.JstlView;
 
 import javax.inject.Inject;
-import java.nio.charset.Charset;
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -50,74 +26,134 @@ import java.util.List;
 @Configuration
 @EnableWebMvc
 @ComponentScan(
-        basePackages = {"com.intelligentEarthquake.controller"},
-        useDefaultFilters = false,
-        includeFilters = {
-                @ComponentScan.Filter(Controller.class),
-                @ComponentScan.Filter(ControllerAdvice.class)
-        }
+        basePackages = {"com.intelligentEarthquake.controller",
+                        "com.intelligentEarthquake.viewResolver",
+                        "com.intelligentEarthquake.dao"}
+//        useDefaultFilters = false,
+//        includeFilters = {
+//                @ComponentScan.Filter(Controller.class),
+//                @ComponentScan.Filter(ControllerAdvice.class)
+//        }
 )
 public class ControllerConfig extends WebMvcConfigurerAdapter {
     @Inject
     Environment env;
 
-    @Inject
-    ApplicationContext applicationContext;
-    @Inject
-    SpringValidatorAdapter validatorAdapter;
+//    @Inject
+//    ApplicationContext applicationContext;
+//    @Inject
+//    ObjectMapper objectMapper;
 
-    @Inject
-    ObjectMapper objectMapper;
-    @Inject
-    Marshaller marshaller;
-    @Inject
-    Unmarshaller unmarshaller;
-
-    @Override
-    public void configureMessageConverters(
-            List<HttpMessageConverter<?>> converters
-    ) {
-        String baseEncode = env.getProperty("project.encode");
-
-        converters.add(new ByteArrayHttpMessageConverter());
-        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
-        stringHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("text", "plain", Charset.forName(baseEncode)),
-                new MediaType("text", "html", Charset.forName(baseEncode))
-        ));
-        converters.add(stringHttpMessageConverter);
-        converters.add(new FormHttpMessageConverter());
-        converters.add(new SourceHttpMessageConverter<>());
-
-        //add json converter
-        MappingJackson2HttpMessageConverter jsonConverter =
-                new MappingJackson2HttpMessageConverter();
-        jsonConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("application", "json", Charset.forName(baseEncode)),
-                new MediaType("text", "json", Charset.forName(baseEncode)),
-                new MediaType("application", "x-www-form-urlencoded", Charset.forName(baseEncode))
-        ));
-        jsonConverter.setObjectMapper(this.objectMapper);
-        converters.add(jsonConverter);
-
-        //add xml converter
-        MarshallingHttpMessageConverter xmlConverter =
-                new MarshallingHttpMessageConverter();
-        xmlConverter.setSupportedMediaTypes(Arrays.asList(
-                new MediaType("application", "xml", Charset.forName(baseEncode)),
-                new MediaType("text", "xml", Charset.forName(baseEncode))
-        ));
-        xmlConverter.setMarshaller(this.marshaller);
-        xmlConverter.setUnmarshaller(this.unmarshaller);
-        converters.add(xmlConverter);
-    }
-
+    /*
+     * Configure ContentNegotiationManager
+     */
     @Override
     public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
-        configurer.favorPathExtension(true).favorParameter(false)
-                .parameterName("mediaType").ignoreAcceptHeader(false)
-                .useJaf(false).defaultContentType(MediaType.APPLICATION_XML)
-                .mediaType("xml", MediaType.APPLICATION_XML)
-                .mediaType("json", MediaType.APPLICATION_JSON);
+            configurer.ignoreAcceptHeader(true).defaultContentType(MediaType.TEXT_HTML);
+        }
+
+//    @Override
+//    public void configureViewResolvers(ViewResolverRegistry registry) {
+//        MappingJackson2JsonView jsonView = new MappingJackson2JsonView();
+//        jsonView.setPrettyPrint(true);
+//        registry.enableContentNegotiation(jsonView);
+//        registry.jsp("/resources/views/", ".jsp");
+//    }
+
+
+    /*
+     * Configure ContentNegotiatingViewResolver
+     */
+    @Bean
+    public ViewResolver contentNegotiatingViewResolver(ContentNegotiationManager manager) {
+        ContentNegotiatingViewResolver resolver = new ContentNegotiatingViewResolver();
+        resolver.setContentNegotiationManager(manager);
+
+        // Define all possible view resolvers
+        List<ViewResolver> resolvers = new ArrayList<ViewResolver>();
+
+        resolvers.add(jsonViewResolver());
+        resolvers.add(jspViewResolver());
+
+        resolver.setViewResolvers(resolvers);
+        return resolver;
     }
+
+    /*
+     * Configure View resolver to provide JSON output using JACKSON library to
+     * convert object in JSON format.
+     */
+    @Bean
+    public ViewResolver jsonViewResolver() {
+        return new JsonViewResolver();
+    }
+
+    /*
+     * Configure View resolver to provide HTML output This is the default format
+     * in absence of any type suffix.
+     */
+    @Bean
+    public ViewResolver jspViewResolver() {
+        InternalResourceViewResolver viewResolver = new InternalResourceViewResolver();
+        viewResolver.setViewClass(JstlView.class);
+        viewResolver.setPrefix("/resources/views/");
+        viewResolver.setSuffix(".jsp");
+        return viewResolver;
+    }
+
+//    @Bean
+//    public UrlBasedViewResolver jspViewResolver() {
+//        InternalResourceViewResolver resolver = new InternalResourceViewResolver();
+//        resolver.setPrefix("/resources/views/");
+//        resolver.setSuffix(".jsp");
+//        return resolver;
+//    }
+
+//    @Override
+//    public void configureMessageConverters(
+//            List<HttpMessageConverter<?>> converters
+//    ) {
+//        String baseEncode = env.getProperty("project.encode");
+//
+//        converters.add(new ByteArrayHttpMessageConverter());
+//        StringHttpMessageConverter stringHttpMessageConverter = new StringHttpMessageConverter();
+//        stringHttpMessageConverter.setSupportedMediaTypes(Arrays.asList(
+//                new MediaType("text", "plain", Charset.forName(baseEncode)),
+//                new MediaType("text", "html", Charset.forName(baseEncode))
+//        ));
+//        converters.add(stringHttpMessageConverter);
+//        converters.add(new FormHttpMessageConverter());
+//        converters.add(new SourceHttpMessageConverter<>());
+//
+//        //add json converter
+//        MappingJackson2HttpMessageConverter jsonConverter =
+//                new MappingJackson2HttpMessageConverter();
+//        jsonConverter.setSupportedMediaTypes(Arrays.asList(
+//                new MediaType("application", "json", Charset.forName(baseEncode)),
+//                new MediaType("text", "json", Charset.forName(baseEncode)),
+//                new MediaType("application", "x-www-form-urlencoded", Charset.forName(baseEncode))
+//        ));
+//        jsonConverter.setObjectMapper(this.objectMapper);
+//        converters.add(jsonConverter);
+//
+//        //add xml converter
+//        MarshallingHttpMessageConverter xmlConverter =
+//                new MarshallingHttpMessageConverter();
+//        xmlConverter.setSupportedMediaTypes(Arrays.asList(
+//                new MediaType("application", "xml", Charset.forName(baseEncode)),
+//                new MediaType("text", "xml", Charset.forName(baseEncode))
+//        ));
+//        xmlConverter.setMarshaller(this.marshaller);
+//        xmlConverter.setUnmarshaller(this.unmarshaller);
+//        converters.add(xmlConverter);
+//    }
+
+//    @Override
+//    public void configureContentNegotiation(ContentNegotiationConfigurer configurer) {
+//        configurer.favorPathExtension(true).favorParameter(false)
+//                .parameterName("mediaType").ignoreAcceptHeader(false)
+//                .useJaf(false).defaultContentType(MediaType.APPLICATION_XML)
+//                .mediaType("xml", MediaType.APPLICATION_XML)
+//                .mediaType("json", MediaType.APPLICATION_JSON);
+//    }
 }
