@@ -1,6 +1,6 @@
 package com.intelligentEarthquake.controller;
 
-import com.intelligentEarthquake.dao.WebPagesDAO;
+import com.intelligentEarthquake.dao.EarthquakeWebpagesDAO;
 import com.intelligentEarthquake.dao.LeftNavDAO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -15,9 +15,9 @@ import java.io.IOException;
  */
 
 @Controller
-public class JsonController {
+public class WebpagesController {
     @Inject
-    WebPagesDAO webPagesDAO;
+    EarthquakeWebpagesDAO earthquakeWebpagesDAO;
     @Inject
     LeftNavDAO leftNavDAO;
     @RequestMapping({"/{var}.json"})
