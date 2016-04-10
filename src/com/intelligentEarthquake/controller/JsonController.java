@@ -1,6 +1,6 @@
 package com.intelligentEarthquake.controller;
 
-import com.intelligentEarthquake.dao.CrawlerDAO;
+import com.intelligentEarthquake.dao.WebPagesDAO;
 import com.intelligentEarthquake.dao.LeftNavDAO;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,7 +17,7 @@ import java.io.IOException;
 @Controller
 public class JsonController {
     @Inject
-    CrawlerDAO crawlerDAO;
+    WebPagesDAO webPagesDAO;
     @Inject
     LeftNavDAO leftNavDAO;
     @RequestMapping({"/{var}.json"})
@@ -26,7 +26,6 @@ public class JsonController {
         response.setCharacterEncoding("utf-8");
         response.setHeader("Access-Control-Allow-Origin","*");
         String json="";
-        String hql = "from CrawlerEntity";
         switch (var){
             case "index":
                 json=index;
